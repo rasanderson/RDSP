@@ -9,8 +9,8 @@ execGRASS("g.region", res="25")
 #execGRASS("g.list", parameters=list(type="vect"))
 topmod_30catch_sp_os <- readVECT("topmod_30catch")
 topmod_30catch_sf_os <- st_as_sf(topmod_30catch_sp_os)
-topmod_30catch_sf_os <- st_set_crs(topmod_30catch_sf, 27700)
-topmod_30catch_sf_ll <- st_transform(topmod_30catch_sf, 4326)
+topmod_30catch_sf_os <- st_set_crs(topmod_30catch_sf_os, 27700)
+topmod_30catch_sf_ll <- st_transform(topmod_30catch_sf_os, 4326)
 
 # osCRS <- CRS("+init=epsg:27700")
 # llCRS <- CRS("+proj=longlat +ellps=WGS84")
@@ -18,12 +18,12 @@ topmod_30catch_sf_ll <- st_transform(topmod_30catch_sf, 4326)
 # topmod_30catch_sp_ll <- spTransform(topmod_30catch_sp_os, llCRS)
 
 
-m <- mapview(topmod_30catch)
+m <- mapview(topmod_30catch_sf_ll)
 leaflet() %>% 
 #m@map %>%
   #leaflet() %>%
   #setView(lng = -1.6178, lat = 54.9783, zoom = 10) # %>%
-  addFeatures(topmod_30catch_sp_ll, group="basins") %>%  # Add default OpenStreetMap map tiles
+  addFeatures(topmod_30catch_sf_ll, group="basins") %>%  # Add default OpenStreetMap map tiles
   addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>% 
   addProviderTiles(providers$OpenStreetMap, group = "Street map") %>% 
   addLayersControl(

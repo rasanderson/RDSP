@@ -32,3 +32,6 @@ leaflet() %>%
     overlayGroups = c("basins"),
     options = layersControlOptions(collapsed = FALSE))  %>% 
   addMarkers(lng=-1.6178, lat=54.9783, popup="Newcastle upon Tyne")
+
+# Check whether ESRI Online available for other maps
+library(leaflet.esri)
