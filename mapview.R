@@ -1,6 +1,6 @@
-library(mapview)
-library(leaflet)
-library(sf)
+# library(mapview)
+# library(leaflet)
+# library(sf)
 
 topmod_30catch_sp_os <- st_read("data/topmod_30.shp")
 topmod_30catch_sf_os <- st_as_sf(topmod_30catch_sp_os)

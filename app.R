@@ -1,8 +1,37 @@
-library(shiny)
 library(leaflet)
+library(mapview)
+library(shiny)
+library(sf)
+# Next packages added explicitly for deployment
+library(abind)
+#library(BH)
+library(RColorBrewer)
+library(RNetCDF)
+library(assertthat)
+library(base64enc)
+library(bindr)
+library(bindrcpp)
+library(brew)
+library(callr)
+library(cli)
+library(crayon)
+library(dplyr)
+library(fansi)
+library(gdtools)
+library(ggplot2)
+library(gridExtra)
+library(gtable)
+library(labeling)
+library(lazyeval)
+library(markdown)
+library(ncdf4)
+
 
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
+
+source("hydrology.R")
+
 
 ui <- fluidPage(
   titlePanel("Rural Observatory"),
@@ -31,3 +60,4 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
+
