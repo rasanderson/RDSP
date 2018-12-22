@@ -1,0 +1,10 @@
+name: rural-observatory
+title:
+username:
+account: ruralobservatory
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 622248
+bundleId: 1779979
+url: https://ruralobservatory.shinyapps.io/rural-observatory/
+when: 1545517569.90823

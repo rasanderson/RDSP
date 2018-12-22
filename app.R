@@ -1,30 +1,28 @@
+# library(base64enc)
+# library(bindr)
+# library(assertthat)
+# library(callr)
+# library(brew)
+# library(bindrcpp)
+# library(abind)
+# library(Rcpp)
+# library(crosstalk)
+# library(crayon)
+# library(colorspace)
+# library(cli)
+# library(classInt)
+# library(RNetCDF)
+# library(RColorBrewer)
+# library(R6)
+# library(DBI)
+# library(BH)
+
+
+# Libraries needed for app
 library(leaflet)
 library(mapview)
 library(shiny)
 library(sf)
-# Next packages added explicitly for deployment
-library(abind)
-#library(BH)
-library(RColorBrewer)
-library(RNetCDF)
-library(assertthat)
-library(base64enc)
-library(bindr)
-library(bindrcpp)
-library(brew)
-library(callr)
-library(cli)
-library(crayon)
-library(dplyr)
-library(fansi)
-library(gdtools)
-library(ggplot2)
-library(gridExtra)
-library(gtable)
-library(labeling)
-library(lazyeval)
-library(markdown)
-library(ncdf4)
 
 
 r_colors <- rgb(t(col2rgb(colors()) / 255))
@@ -44,17 +42,17 @@ server <- function(input, output, session) {
   
   output$mymap <- renderLeaflet({
 
-    leaflet() %>% 
-      addTiles(group = "OSM (default)") %>% 
-      addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>% 
+    leaflet() %>%
+      addTiles(group = "OSM (default)") %>%
+      addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
       addFeatures(topmod_30catch_sf_ll,
                   highlightOptions = highlightOptions(color = "red", weight = 2,
                                                       bringToFront = TRUE),
-                  group="basins") %>%  
+                  group="basins") %>%
       addLayersControl(
         baseGroups = c("OSM (default)", "Satellite"),
         overlayGroups = c("basins"),
-        options = layersControlOptions(collapsed = FALSE))  %>% 
+        options = layersControlOptions(collapsed = FALSE))  %>%
       addMarkers(lng=-1.6178, lat=54.9783, popup="Newcastle upon Tyne")
   })
 }
