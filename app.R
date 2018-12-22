@@ -25,10 +25,6 @@ server <- function(input, output, session) {
   #points <- eventReactive(input$recalc, {
   #  cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
   #}, ignoreNULL = FALSE)
-  
-  
- 
-  
    
   output$mymap <- renderLeaflet({
       # #setView(lng = -1.6178, lat = 54.9783, zoom = 9) %>% 
@@ -58,16 +54,6 @@ server <- function(input, output, session) {
         overlayGroups = c("basins"),
         options = layersControlOptions(collapsed = FALSE))  %>% 
       addMarkers(lng=-1.6178, lat=54.9783, popup="Newcastle upon Tyne")
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
   })
 }
 

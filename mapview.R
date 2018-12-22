@@ -1,13 +1,14 @@
 library(mapview)
 library(leaflet)
-library(rgrass7)
+# library(rgrass7)
 library(sf)
 
-initGRASS(gisBase="/usr/lib/grass74", location="tyne", mapset="nras",
-          gisDbase="/data/grass", override=TRUE, remove_GISRC=TRUE)
-execGRASS("g.region", res="25")
-#execGRASS("g.list", parameters=list(type="vect"))
-topmod_30catch_sp_os <- readVECT("topmod_30catch")
+# initGRASS(gisBase="/usr/lib/grass74", location="tyne", mapset="nras",
+#           gisDbase="/data/grass", override=TRUE, remove_GISRC=TRUE)
+# execGRASS("g.region", res="25")
+# execGRASS("g.list", parameters=list(type="vect"))
+# topmod_30catch_sp_os <- readVECT("topmod_30catch")
+topmod_30catch_sp_os <- st_read("data/topmod_30.shp")
 topmod_30catch_sf_os <- st_as_sf(topmod_30catch_sp_os)
 topmod_30catch_sf_os <- st_set_crs(topmod_30catch_sf_os, 27700)
 topmod_30catch_sf_ll <- st_transform(topmod_30catch_sf_os, 4326)
