@@ -1,28 +1,11 @@
-# library(base64enc)
-# library(bindr)
-# library(assertthat)
-# library(callr)
-# library(brew)
-# library(bindrcpp)
-# library(abind)
-# library(Rcpp)
-# library(crosstalk)
-# library(crayon)
-# library(colorspace)
-# library(cli)
-# library(classInt)
-# library(RNetCDF)
-# library(RColorBrewer)
-# library(R6)
-# library(DBI)
-# library(BH)
-
-
 # Libraries needed for app
 library(leaflet)
 library(mapview)
 library(shiny)
+library(shinydashboard)
 library(sf)
+
+rm(list=ls())
 
 
 r_colors <- rgb(t(col2rgb(colors()) / 255))
@@ -30,13 +13,35 @@ names(r_colors) <- colors()
 
 source("hydrology.R")
 
-
-ui <- fluidPage(
-  titlePanel("Rural Observatory"),
-  leafletOutput("mymap"),
-  p(),
-  actionButton("recalc", "New points")
-)
+ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
+  dashboardHeader(title="Rural Observatory"),
+  dashboardSidebar(),
+  dashboardBody(
+    navbarPage("",
+               
+    tabPanel("Home",
+             h1("Newcastle University Rural Observatory"),
+             h2("Introduction"),
+             p("Welcome to the Rural Observatory (beta). This website give access
+               to physical, environmental, socio-economic and medical data for
+               North East England. Navigate through the website using the tab
+               buttons across the top, and the menu bars on the left.")
+             ),
+    
+    tabPanel("Physical",
+             h1("Physical landscape"),
+             p("Here you can access elevation, meteorology etc.")),
+    
+    tabPanel(title="Hydrology",
+             h1("Hydrology and river networks"),
+             p("Information on sub-catchments for the River Tyne"),
+             fluidPage(
+               leafletOutput("mymap"),
+               p(),
+               actionButton("recalc", "New points")
+             )
+    )
+)))
 
 server <- function(input, output, session) {
   
