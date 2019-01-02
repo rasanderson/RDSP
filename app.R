@@ -6,6 +6,7 @@ library(shinydashboard)
 library(sf)
 library(rgdal)
 library(raster)
+library(dplyr)
 
 rm(list=ls())
 
@@ -15,6 +16,7 @@ names(r_colors) <- colors()
 
 source("hydrology.R")
 source("AgCensus.R")
+source("National_Biodiversity_Network.R")
 
 ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
   dashboardHeader(title="Rural Observatory"),
@@ -30,11 +32,13 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                North East England. Navigate through the website using the tab
                buttons across the top, and the menu bars on the left.")
              ),
-    tabPanel(title = "Physical",
-             h1("Physical landscape"),
-             p("Here you can access elevation, meteorology etc."),
+    tabPanel(title = "NBN",
+             h1("National Biodiversity Atlas"),
+             p("Here you can access selected species distribution data from the
+               National Biodiversit Atlas (previously the National Biodiversity
+               Network)."),
              fluidPage(
-               leafletOutput("physical_map")
+               leafletOutput("nbn_map")
              )),
     tabPanel(title = "Livestock",
              h1("Agricultural census data"),
@@ -52,10 +56,11 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
 
 server <- function(input, output, session) {
   
-  output$physical_map  <- renderLeaflet({
+  output$nbn_map  <- renderLeaflet({
     leaflet(options = leafletOptions(minZoom = 8, zoomDelta=0.05, zoomSnap=0.05)) %>%
       addTiles(group = "OSM (default)") %>%
-      addProviderTiles(providers$Esri.WorldTerrain, group = "Satellite") %>% 
+      addCircleMarkers(lng = nbn_subset_ll$lng, lat = nbn_subset_ll$lat,
+                       popup = nbn_subset_ll$spp) %>% 
       setView( lng = -2
                , lat = 55
                , zoom = 8.6 )  %>%
@@ -97,13 +102,14 @@ server <- function(input, output, session) {
     leaflet(options = leafletOptions(minZoom = 8, zoomDelta=0.05, zoomSnap=0.05)) %>%
       addTiles(group = "OSM (default)") %>%
       addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
+      addProviderTiles(providers$Esri.WorldShadedRelief, group = "Relief") %>% 
       addFeatures(topmod_30catch_sf_ll,
                   highlightOptions = highlightOptions(color = "red", weight = 2,
                                                       bringToFront = TRUE),
                   group="Tyne subcatchments") %>%
       addFeatures(tyne_rivers_ll, group="River network") %>% 
       addLayersControl(
-        baseGroups = c("OSM (default)", "Satellite"),
+        baseGroups = c("OSM (default)", "Satellite", "Relief"),
         overlayGroups = c("Tyne subcatchments", "River network"),
         options = layersControlOptions(collapsed = FALSE))  %>%
       addMarkers(lng=-1.6178, lat=54.9783, popup="Newcastle upon Tyne") %>% 
