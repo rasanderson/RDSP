@@ -7,6 +7,11 @@ records_ll <- st_set_crs(records_ll, 4326)
 nbn_subset_ll <- records_ll %>% 
   dplyr::select(rank, order, family, genus, spp=scientificNameOriginal, year=endYear) %>% 
   mutate(lng=st_coordinates(records_ll)[,1], lat=st_coordinates(records_ll)[,2])
+
+nbn_family_lst <- as.list(c("All records", sort(unique(nbn_subset_ll$family))))
+names(nbn_family_lst) <- c("All records", sort(unique(nbn_subset_ll$family)))
+nbn_family_lst <- nbn_family_lst[nbn_family_lst[] != ""] # Remove un-named records                        
+
 # library(leaflet)
 # library(mapview)
 # nbn_subset_ll <- dplyr::filter(subset_ll, year==1978, genus=="Machimus")

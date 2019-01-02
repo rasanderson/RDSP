@@ -30,33 +30,42 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
   ),
   dashboardBody(
     tabItems(
-      tabItem(tabName = "home",
+      tabItem(tabName = "home", # UI Home ####
               h1("Newcastle University Rural Observatory"),
               h2("Introduction"),
-              p("Welcome to the Rural Observatory (beta). This website give access
-               to physical, environmental, socio-economic and medical data for
-               North East England. Navigate through the website using the tab
-               buttons across the top, and the menu bars on the left.")
+              h3("Welcome to the Rural Observatory (beta). This website give access
+                to physical, environmental, socio-economic and medical data for
+                North East England. Navigate through the website using the menu 
+                bars on the left.")
       ),
-      tabItem(tabName = "nbn",
+      tabItem(tabName = "nbn", # UI Biodiversity ####
               h1("National Biodiversity Atlas"),
-              p("Here you can access selected species distribution data from the
-                National Biodiversit Atlas (previously the National Biodiversity
-                Network)."),
+              h4("Here you can access selected species distribution data from the
+                 National Biodiversit Atlas (previously the National Biodiversity
+                 Network)."),
               fluidPage(
-                leafletOutput("nbn_map")
+                sidebarLayout(
+                  sidebarPanel(
+                    selectInput(inputId = "nbn_select", h2("Family"), 
+                                choices = nbn_family_lst) #,
+                    #verbatimTextOutput("out1")
+                  ),
+                  mainPanel(
+                    leafletOutput("nbn_map")
+                  )
+                )
               )
       ),
-      tabItem(tabName = "AgCensus",
+      tabItem(tabName = "AgCensus", # UI AgCensus ####
               h1("Agricultural census data"),
-              p("Summary data from the Agricultural census, 2km resolution"),
+              h4("Summary data from the Agricultural census, 2km resolution"),
               fluidPage(
                 leafletOutput("census_map")
               )
       ),
-      tabItem(tabName = "Hydrology",
+      tabItem(tabName = "Hydrology", # UI Hydrology ####
               h1("Hydrology and river networks"),
-              p("Information on sub-catchments for the River Tyne"),
+              h4("Information on sub-catchments for the River Tyne"),
               fluidPage(
                 leafletOutput("hydrology_map")
               )
@@ -68,21 +77,30 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
 
 server <- function(input, output, session) {
   
-  output$nbn_map  <- renderLeaflet({
+  output$nbn_map  <- renderLeaflet({ # Server Biodiversity ####
+    nbn_subset_plot <- reactive(
+      if(input$nbn_select=="All records"){
+        nbn_subset_ll
+      } else {
+        dplyr::filter(nbn_subset_ll, family==input$nbn_select)
+      }
+    )
+
     leaflet(options = leafletOptions(minZoom = 8, zoomDelta=0.05, zoomSnap=0.05)) %>%
       addTiles(group = "OSM (default)") %>%
-      addCircleMarkers(lng = nbn_subset_ll$lng, lat = nbn_subset_ll$lat,
-                       popup = nbn_subset_ll$spp) %>% 
-      setView( lng = -2
-               , lat = 55
-               , zoom = 8.6 )  %>%
-      setMaxBounds( lng1 = -1.5
-                    , lat1 = 54.5
-                    , lng2 = -2.5
-                    , lat2 = 55.5 )
+      addCircleMarkers(lng = nbn_subset_plot()$lng, lat = nbn_subset_plot()$lat,
+                       popup = paste("<b>Taxonomy:</b> ", nbn_subset_plot()$spp,"<br/>",
+                                    "<b>Year:</b> ",  nbn_subset_plot()$year)) %>% 
+      setView(lng = -2, lat = 55, zoom = 8.6)  %>%
+      setMaxBounds(lng1 = -1.5,
+                   lat1 = 54.5,
+                   lng2 = -2.5,
+                   lat2 = 55.5)
   })
   
-  output$census_map <- renderLeaflet({
+  output$out1 <- renderPrint(input$nbn_select)
+  
+  output$census_map <- renderLeaflet({ # Server AgCensus ####
     # Colours: http://colorbrewer2.org/#type=sequential&scheme=YlGn&n=3 
     palcow <- colorBin(c("#FFFFCC", "#c2e699", "#78c679", "#31a354", "#006837"),
                        values(AgCensus_cows_ll), na.color = "transparent")
@@ -100,17 +118,15 @@ server <- function(input, output, session) {
         options = layersControlOptions(collapsed = FALSE))  %>%
       addLegend(pal=palcow,   values=values(AgCensus_cows_ll), title="Cattle/km", group="Cattle") %>%
       addLegend(pal=palsheep, values=values(AgCensus_sheep_ll), title="Sheep/km", group="Sheep") %>%
-      setView( lng = -2
-               , lat = 55
-               , zoom = 8.6 )  %>%
-      setMaxBounds( lng1 = -1.5
-                    , lat1 = 54.5
-                    , lng2 = -2.5
-                    , lat2 = 55.5 ) %>% 
+      setView( lng = -2, lat = 55, zoom = 8.6)  %>%
+      setMaxBounds(lng1 = -1.5,
+                   lat1 = 54.5,
+                   lng2 = -2.5,
+                   lat2 = 55.5) %>% 
       hideGroup("Sheep")
   })
 
-  output$hydrology_map <- renderLeaflet({
+  output$hydrology_map <- renderLeaflet({ # Server hydrology ####
     leaflet(options = leafletOptions(minZoom = 8, zoomDelta=0.05, zoomSnap=0.05)) %>%
       addTiles(group = "OSM (default)") %>%
       addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
@@ -125,13 +141,11 @@ server <- function(input, output, session) {
         overlayGroups = c("Tyne subcatchments", "River network"),
         options = layersControlOptions(collapsed = FALSE))  %>%
       addMarkers(lng=-1.6178, lat=54.9783, popup="Newcastle upon Tyne") %>% 
-      setView( lng = -2
-               , lat = 55
-               , zoom = 8.6 )  %>%
-      setMaxBounds( lng1 = -1.5
-                    , lat1 = 54.5
-                    , lng2 = -2.5
-                    , lat2 = 55.5 ) %>% 
+      setView(lng = -2, lat = 55, zoom = 8.6)  %>%
+      setMaxBounds(lng1 = -1.5,
+                   lat1 = 54.5,
+                   lng2 = -2.5,
+                   lat2 = 55.5 ) %>% 
     hideGroup("Tyne subcatchments")
   })
 }
