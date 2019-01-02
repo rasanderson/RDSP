@@ -20,39 +20,51 @@ source("National_Biodiversity_Network.R")
 
 ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
   dashboardHeader(title="Rural Observatory"),
-  dashboardSidebar(),
+  dashboardSidebar(
+    sidebarMenu(
+      menuItem("Home", tabName="home", icon=icon("home")),
+      menuItem("Biodiversity", tabName = "nbn", icon = icon("bug")),
+      menuItem("Farming", tabName = "AgCensus", icon = icon("grain", lib="glyphicon")),
+      menuItem("Hydrology", tabName = "Hydrology", icon = icon("tint"))
+    )
+  ),
   dashboardBody(
-    navbarPage("",
-               
-    tabPanel("Home",
-             h1("Newcastle University Rural Observatory"),
-             h2("Introduction"),
-             p("Welcome to the Rural Observatory (beta). This website give access
+    tabItems(
+      tabItem(tabName = "home",
+              h1("Newcastle University Rural Observatory"),
+              h2("Introduction"),
+              p("Welcome to the Rural Observatory (beta). This website give access
                to physical, environmental, socio-economic and medical data for
                North East England. Navigate through the website using the tab
                buttons across the top, and the menu bars on the left.")
-             ),
-    tabPanel(title = "NBN",
-             h1("National Biodiversity Atlas"),
-             p("Here you can access selected species distribution data from the
-               National Biodiversit Atlas (previously the National Biodiversity
-               Network)."),
-             fluidPage(
-               leafletOutput("nbn_map")
-             )),
-    tabPanel(title = "Livestock",
-             h1("Agricultural census data"),
-             p("Summary data from the Agricultural census, 2km resolution"),
-             fluidPage(
-               leafletOutput("census_map")
-             )),
-    tabPanel(title = "Hydrology",
-             h1("Hydrology and river networks"),
-             p("Information on sub-catchments for the River Tyne"),
-             fluidPage(
-               leafletOutput("hydrology_map")
-             ))
-)))
+      ),
+      tabItem(tabName = "nbn",
+              h1("National Biodiversity Atlas"),
+              p("Here you can access selected species distribution data from the
+                National Biodiversit Atlas (previously the National Biodiversity
+                Network)."),
+              fluidPage(
+                leafletOutput("nbn_map")
+              )
+      ),
+      tabItem(tabName = "AgCensus",
+              h1("Agricultural census data"),
+              p("Summary data from the Agricultural census, 2km resolution"),
+              fluidPage(
+                leafletOutput("census_map")
+              )
+      ),
+      tabItem(tabName = "Hydrology",
+              h1("Hydrology and river networks"),
+              p("Information on sub-catchments for the River Tyne"),
+              fluidPage(
+                leafletOutput("hydrology_map")
+              )
+      )
+    )
+  )
+)
+
 
 server <- function(input, output, session) {
   
