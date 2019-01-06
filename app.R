@@ -43,6 +43,10 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
               h4("Here you can access selected species distribution data from the
                  National Biodiversit Atlas (previously the National Biodiversity
                  Network)."),
+              tags$br(),
+              h4("Note: Use the drop-down menu on the left to select taxa of
+                 interest, and click on points to obtain details about species,
+                 year of collection and recorder (where available)."),
               fluidPage(
                 sidebarLayout(
                   sidebarPanel(
@@ -90,7 +94,8 @@ server <- function(input, output, session) {
       addTiles(group = "OSM (default)") %>%
       addCircleMarkers(lng = nbn_subset_plot()$lng, lat = nbn_subset_plot()$lat,
                        popup = paste("<b>Taxonomy:</b> ", nbn_subset_plot()$spp,"<br/>",
-                                    "<b>Year:</b> ",  nbn_subset_plot()$year)) %>% 
+                                    "<b>Year:</b> ",  nbn_subset_plot()$year, "<br/>",
+                                    "<b>Recorder:</b> ", nbn_subset_plot()$recorder)) %>% 
       setView(lng = -2, lat = 55, zoom = 8.6)  %>%
       setMaxBounds(lng1 = -1.5,
                    lat1 = 54.5,

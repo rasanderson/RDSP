@@ -5,7 +5,7 @@ records_nbn <- readRDS("data/Diptera.RDS")
 records_ll <- st_as_sf(records_nbn$data, coords=c("longitudeWGS84", "latitudeWGS84"))
 records_ll <- st_set_crs(records_ll, 4326)
 nbn_subset_ll <- records_ll %>% 
-  dplyr::select(rank, order, family, genus, spp=scientificNameOriginal, year=endYear) %>% 
+  dplyr::select(rank, order, family, genus, spp=scientificNameOriginal, year=endYear, recorder) %>% 
   mutate(lng=st_coordinates(records_ll)[,1], lat=st_coordinates(records_ll)[,2])
 
 nbn_family_lst <- as.list(c("All records", sort(unique(nbn_subset_ll$family))))
