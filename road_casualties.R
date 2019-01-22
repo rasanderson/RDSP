@@ -23,7 +23,7 @@ RTA_ll <-
                                       ifelse(`Casualty Severity` == "Fatal", "black", NA))))
 
 
-RTA_daily_counts <- RTA_ll %>% group_by(month = floor_date(Date), `Casualty Severity`) %>% 
-  summarise(monthly_RTA = n())
-ggplot(RTA_daily_counts, aes(x=month, y=monthly_RTA, color = `Casualty Severity`)) +
-         geom_smooth()
+RTA_daily_counts <- RTA_ll %>% group_by(day = floor_date(Date), `Casualty Severity`) %>% 
+  summarise(daily_RTA = n())
+# ggplot(RTA_daily_counts, aes(x=day, y=daily_RTA, color = `Casualty Severity`)) +
+#          geom_smooth()

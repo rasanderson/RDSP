@@ -78,7 +78,8 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
       ),
       tabItem(tabName = "Traffic", # UI road casualties ####
               h1("Road traffic accidents"),
-              h4("Information on the severity and distribution of RTAs"),
+              h4("Information on the severity and distribution of RTAs. Click
+                 on the symbols in the map for information on vehicles involved."),
               fluidPage(
                 sidebarLayout(
                   sidebarPanel(
@@ -87,7 +88,8 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                     #verbatimTextOutput("out1")
                   ),
                   mainPanel(
-                    leafletOutput("RTA_map")
+                    leafletOutput("RTA_map"),
+                    plotOutput("RTA_plot")
                   )
                 )
               )
@@ -194,6 +196,21 @@ server <- function(input, output, session) {
                    lat1 = 54.5,
                    lng2 = -1.5,
                    lat2 = 57 )
+  })
+  
+  output$RTA_plot <- renderPlot({
+    RTA_fig <- reactive(
+      if(input$RTA_severity_sel == "All records"){
+         RTA_daily_counts
+      }else{
+        dplyr::filter(RTA_daily_counts, `Casualty Severity`==input$RTA_severity_sel)
+      }
+    )
+    #plot(RTA_fig()$day, RTA_fig()$daily_RTA)
+    ggplot(RTA_fig(), aes(x=day, y=daily_RTA)) +
+      geom_smooth() +
+      ylab("Number of RTA per day") +
+      xlab("Date")
   })
 }
 
