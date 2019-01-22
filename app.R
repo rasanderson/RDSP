@@ -17,6 +17,7 @@ names(r_colors) <- colors()
 source("hydrology.R")
 source("AgCensus.R")
 source("National_Biodiversity_Network.R")
+source("road_casualties.R")
 
 ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
   dashboardHeader(title="Rural Observatory"),
@@ -25,7 +26,8 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
       menuItem("Home", tabName="home", icon=icon("home")),
       menuItem("Biodiversity", tabName = "nbn", icon = icon("bug")),
       menuItem("Farming", tabName = "AgCensus", icon = icon("grain", lib="glyphicon")),
-      menuItem("Hydrology", tabName = "Hydrology", icon = icon("tint"))
+      menuItem("Hydrology", tabName = "Hydrology", icon = icon("tint")),
+      menuItem("Traffic", tabName = "Traffic", icon = icon("car"))
     )
   ),
   dashboardBody(
@@ -72,6 +74,22 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
               h4("Information on sub-catchments for the River Tyne"),
               fluidPage(
                 leafletOutput("hydrology_map")
+              )
+      ),
+      tabItem(tabName = "Traffic", # UI road casualties ####
+              h1("Road traffic accidents"),
+              h4("Information on the severity and distribution of RTAs"),
+              fluidPage(
+                sidebarLayout(
+                  sidebarPanel(
+                    selectInput(inputId = "RTA_severity_sel", h2("Severity"), 
+                                choices = RTA_severity_lst) #,
+                    #verbatimTextOutput("out1")
+                  ),
+                  mainPanel(
+                    leafletOutput("RTA_map")
+                  )
+                )
               )
       )
     )
@@ -152,6 +170,30 @@ server <- function(input, output, session) {
                    lng2 = -2.5,
                    lat2 = 55.5 ) %>% 
     hideGroup("Tyne subcatchments")
+  })
+  
+  output$RTA_map <- renderLeaflet({ # Server RTA ####
+    RTA_severity_plot <- reactive(
+      if(input$RTA_severity_sel=="All records"){
+        RTA_ll
+      } else {
+        dplyr::filter(RTA_ll, `Casualty Severity`==input$RTA_severity_sel)
+      }
+    )
+    
+    leaflet(options = leafletOptions(minZoom = 8, zoomDelta=0.05, zoomSnap=0.05)) %>%
+      addTiles(group = "OSM (default)") %>% 
+      addCircleMarkers(lng = RTA_severity_plot()$lng, lat = RTA_severity_plot()$lat,
+                       color = RTA_severity_plot()$symbol_color,
+                       popup = paste("<b>Vehicle:</b> ", RTA_severity_plot()$`Vehicle Type`,"<br/>",
+                                     "<b>Date:</b> ",  RTA_severity_plot()$Date, "<br/>",
+                                     "<b>Severity:</b> ", RTA_severity_plot()$`Casualty Severity`)) %>% 
+      
+      #setView(lng = -2, lat = 55, zoom = 8.6)  %>%
+      setMaxBounds(lng1 = -3,
+                   lat1 = 54.5,
+                   lng2 = -1.5,
+                   lat2 = 57 )
   })
 }
 
