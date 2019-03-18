@@ -83,7 +83,16 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                  in fields based on simulated rainfall, cattle movements,
                  cropping patterns and the disease characteristics"),
               fluidPage(
-                imageOutput("campy_map")
+                sidebarLayout(
+                  sidebarPanel(
+                    sliderInput("campy_slider", "Day of year",
+                                min = 60, max = 300,
+                                value = 60, step = 60)
+                  ),
+                  mainPanel(
+                     imageOutput("campy_map")
+                  )
+                )
               )
       ),
       tabItem(tabName = "Traffic", # UI road casualties ####
