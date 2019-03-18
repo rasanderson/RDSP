@@ -27,6 +27,7 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
       menuItem("Biodiversity", tabName = "nbn", icon = icon("bug")),
       menuItem("Farming", tabName = "AgCensus", icon = icon("grain", lib="glyphicon")),
       menuItem("Hydrology", tabName = "Hydrology", icon = icon("tint")),
+      menuItem("Health", tabName = "Campy", icon = icon("ambulance")),
       menuItem("Traffic", tabName = "Traffic", icon = icon("car"))
     )
   ),
@@ -74,6 +75,15 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
               h4("Information on sub-catchments for the River Tyne"),
               fluidPage(
                 leafletOutput("hydrology_map")
+              )
+      ),
+      tabItem(tabName = "Campy", # UI Campylobacter maps ####
+              h1("Regional risk of Campylobacter"),
+              h4("These maps show the predicted spatial risk of contamination
+                 in fields based on simulated rainfall, cattle movements,
+                 cropping patterns and the disease characteristics"),
+              fluidPage(
+                imageOutput("campy_map")
               )
       ),
       tabItem(tabName = "Traffic", # UI road casualties ####
@@ -173,6 +183,12 @@ server <- function(input, output, session) {
                    lat2 = 55.5 ) %>% 
     hideGroup("Tyne subcatchments")
   })
+  
+  output$campy_map <- renderImage({ # Server Campy maps ####
+    #filename = normalizePath(file.path("www/campy risk_60_v3.png"))
+    list(src = "www/campy risk_60_v3.png", height=800, width=600)
+    }, deleteFile = FALSE
+  )
   
   output$RTA_map <- renderLeaflet({ # Server RTA ####
     RTA_severity_plot <- reactive(

@@ -5,6 +5,6 @@ account: ruralobservatory
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 622248
-bundleId: 1793818
+bundleId: 1829438
 url: https://ruralobservatory.shinyapps.io/rural-observatory/
-when: 1546464321.42707
+when: 1548175950.28796
