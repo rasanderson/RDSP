@@ -83,7 +83,19 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                  in fields based on simulated rainfall, cattle movements,
                  cropping patterns and the disease characteristics"),
               fluidPage(
-                imageOutput("campy_map")
+                sidebarLayout(
+                  sidebarPanel(
+                    sliderInput("campy_slider", "Day of year (click play button to animate)",
+                                min = 60, max = 300,
+                                value = 60, step = 60,
+                                animate = animationOptions(interval = 300,
+                                                           loop = TRUE)
+                                )
+                  ),
+                  mainPanel(
+                     imageOutput("campy_map")
+                  )
+                )
               )
       ),
       tabItem(tabName = "Traffic", # UI road casualties ####
@@ -185,9 +197,10 @@ server <- function(input, output, session) {
   })
   
   output$campy_map <- renderImage({ # Server Campy maps ####
-    #filename = normalizePath(file.path("www/campy risk_60_v3.png"))
-    list(src = "www/campy risk_60_v3.png", height=800, width=600)
-    }, deleteFile = FALSE
+    day_no <- input$campy_slider
+    campy_file <- paste0("www/campy risk_", day_no, "_v3.png")
+    list(src = campy_file, height=800, width=600)
+  }, deleteFile = FALSE
   )
   
   output$RTA_map <- renderLeaflet({ # Server RTA ####
