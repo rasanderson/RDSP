@@ -83,17 +83,22 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                  in fields based on simulated rainfall, cattle movements,
                  cropping patterns and the disease characteristics"),
               fluidPage(
-                sidebarLayout(
-                  sidebarPanel(
-                    sliderInput("campy_slider", "Day of year (click play button to animate)",
-                                min = 60, max = 300,
-                                value = 60, step = 60,
-                                animate = animationOptions(interval = 300,
-                                                           loop = TRUE)
-                                )
+                fluidRow(
+                  column(3,
+                         p("Outputs from a model developed by Shirley, Rushton et al. to simulate
+                         Campylobacter risk in relation to temperature, rainfall, pasture growth
+                         and husbandry of cattle and sheep"),
+                         sliderInput("campy_slider", "Day of year",
+                                     min = 10, max = 360,
+                                     value = 10, step = 10
+                         )
                   ),
-                  mainPanel(
-                     imageOutput("campy_map")
+                  column(3,
+                           p("Model schema"),
+                           img(src="campy_model.png", height='424px', width='572px')
+                  ),
+                  column(3, offset = 2,
+                         imageOutput("campy_map")
                   )
                 )
               )
@@ -199,7 +204,7 @@ server <- function(input, output, session) {
   output$campy_map <- renderImage({ # Server Campy maps ####
     day_no <- input$campy_slider
     campy_file <- paste0("www/campy risk_", day_no, "_v3.png")
-    list(src = campy_file, height=800, width=600)
+    list(src = campy_file, height=600, width=450)
   }, deleteFile = FALSE
   )
   
