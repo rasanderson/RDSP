@@ -34,28 +34,40 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
   dashboardBody(
     tabItems(
       tabItem(tabName = "home", # UI Home ####
-              h1("Newcastle University Rural Observatory"),
+              h1("Newcastle University Rural Observatory (beta)"),
+              img(src="cheviots.png"),
               h2("Introduction"),
               h3("Welcome to the Rural Observatory (beta). This website give access
                 to physical, environmental, socio-economic and medical data for
                 North East England. Navigate through the website using the menu 
-                bars on the left.")
+                bars on the left."),
+              hr(),
+              h3("This website has been developed part of a pilot study to explore the potential for a
+                Rural Observatory system. It will provide a repository for data, collected from
+                national, regional, local and University sources. It will also integrate with 
+                real-time models, to allow end-users to explore the potential impacts of different
+                scenarios on the environmental, socio-economics, and human health in rural areas.")
       ),
       tabItem(tabName = "nbn", # UI Biodiversity ####
               h1("National Biodiversity Atlas"),
-              h4("Here you can access selected species distribution data from the
-                 National Biodiversit Atlas (previously the National Biodiversity
+              h3("Here you can access selected species distribution data from the
+                 National Biodiversity Atlas (previously the National Biodiversity
                  Network)."),
               tags$br(),
-              h4("Note: Use the drop-down menu on the left to select taxa of
+              h3("Note: Use the drop-down menu on the left to select taxa of
                  interest, and click on points to obtain details about species,
                  year of collection and recorder (where available)."),
               fluidPage(
                 sidebarLayout(
                   sidebarPanel(
+                    h3("The National Biodiversity Atlas is used to collect `citizen science` data
+                       on species-distributions throughout the UK. Users will eventually be able
+                       to use the Rural Observatory to overlay species records with environmental
+                       data, plot changes over time, etc. The beta version displays data for just
+                       one group of species, the Diptera (true flies) but it will eventually 
+                       provide access to records for numerous plants and animals across the region."),
                     selectInput(inputId = "nbn_select", h2("Family"), 
                                 choices = nbn_family_lst) #,
-                    #verbatimTextOutput("out1")
                   ),
                   mainPanel(
                     leafletOutput("nbn_map")
@@ -65,27 +77,45 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
       ),
       tabItem(tabName = "AgCensus", # UI AgCensus ####
               h1("Agricultural census data"),
-              h4("Summary data from the Agricultural census, 2km resolution"),
+              h3("Summary data from the Agricultural census, 2km resolution"),
               fluidPage(
-                leafletOutput("census_map")
+                sidebarPanel(
+                  h3("Agricultural Census data are collected by Defra on an annual basis. The full
+                    dataset includes information on number of all farms, those in Least Favoured 
+                    Areas (LFAs), area farmed, grass, cattle, sheep, pigs, poultry, numbers of
+                    farmers and numbers of self-employed. It is planned that this part of the RO 
+                    will eventually contain more of these data, updated as they become available.")
+                ),
+                mainPanel(
+                  leafletOutput("census_map")
+                )
               )
       ),
       tabItem(tabName = "Hydrology", # UI Hydrology ####
               h1("Hydrology and river networks"),
-              h4("Information on sub-catchments for the River Tyne"),
+              h3("Information on sub-catchments for the River Tyne"),
               fluidPage(
-                leafletOutput("hydrology_map")
+                sidebarPanel(
+                  h3("A wide range of hydrologically relevant data is collected at Newcastle University.
+                    This page shows the main river networks and subcatchments within the catchment of
+                    the River Tyne. The page will be integrated with temperature and rainfall data
+                    from the Meteorological Office, that will be fed into hydrological models such
+                    as TOPMODEL and SHE to predict rates of water flow, flood risk etc.")
+                ),
+                mainPanel(
+                  leafletOutput("hydrology_map")
+                )
               )
       ),
       tabItem(tabName = "Campy", # UI Campylobacter maps ####
               h1("Regional risk of Campylobacter"),
-              h4("These maps show the predicted spatial risk of contamination
+              h3("These maps show the predicted spatial risk of contamination
                  in fields based on simulated rainfall, cattle movements,
                  cropping patterns and the disease characteristics"),
               fluidPage(
                 fluidRow(
                   column(3,
-                         p("Outputs from a model developed by Shirley, Rushton et al. to simulate
+                         h3("Outputs from a model developed by Shirley, Rushton et al. to simulate
                          Campylobacter risk in relation to temperature, rainfall, pasture growth
                          and husbandry of cattle and sheep"),
                          sliderInput("campy_slider", "Day of year",
@@ -94,7 +124,7 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                          )
                   ),
                   column(3,
-                           p("Model schema"),
+                           h3("Model schema"),
                            img(src="campy_model.png", height='424px', width='572px')
                   ),
                   column(3, offset = 2,
@@ -104,18 +134,23 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
               )
       ),
       tabItem(tabName = "Traffic", # UI road casualties ####
-              h1("Road traffic accidents"),
-              h4("Information on the severity and distribution of RTAs. Click
-                 on the symbols in the map for information on vehicles involved."),
+              h1("Road Traffic Accidents (RTA)"),
+              h3("Information on the severity and distribution of RTAs, both in space and time.
+                  Understanding RTAs is essential, given their severe social costs, and the RO will
+                  help to identify potential accident blackspots, relative to the volume of traffic,
+                  road speed limits, class of roads, and types of vehicles involved."),
               fluidPage(
                 sidebarLayout(
                   sidebarPanel(
+                    h3("Click on the symbols to display information about the types of vehicle
+                       involved in the RTA."),
                     selectInput(inputId = "RTA_severity_sel", h2("Severity"), 
                                 choices = RTA_severity_lst) #,
-                    #verbatimTextOutput("out1")
                   ),
                   mainPanel(
+                    h3("Distribution map"),
                     leafletOutput("RTA_map"),
+                    h3("Changes over time"),
                     plotOutput("RTA_plot")
                   )
                 )
