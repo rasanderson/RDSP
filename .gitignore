@@ -3,5 +3,4 @@
 .RData
 .Ruserdata
 packrat/lib*/
-packrat*
 rsconnect/shinyapps.io/mep-ncl/rural-observatory.dcf
