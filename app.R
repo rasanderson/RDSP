@@ -14,10 +14,14 @@ rm(list=ls())
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
 
-source("hydrology.R")
-source("AgCensus.R")
-source("National_Biodiversity_Network.R")
-source("road_casualties.R")
+topmod_30catch_sf_ll <- readRDS("data/topmod_30catch.RDS")
+tyne_rivers_ll <- readRDS("data/tyne_rivers.RDS")
+AgCensus_sheep_ll <- readRDS("data/AgCensus_sheep_ll.RDS")
+AgCensus_cows_ll  <- readRDS("data/AgCensus_cows_ll.RDS")
+nbn_subset_ll <- readRDS("data/nbn_subset_ll.RDS")
+nbn_family_lst <- readRDS("data/nbn_family_lst.RDS")
+RTA_ll <- readRDS("data/RTA_ll.RDS")
+RTA_daily_counts <- readRDS("data/RTA_daily_counts.RDS")
 
 ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
   dashboardHeader(title="Rural Observatory"),

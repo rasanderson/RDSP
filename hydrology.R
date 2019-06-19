@@ -12,3 +12,6 @@ topmod_30catch_sf_ll <- st_transform(topmod_30catch_sf_os, 4326)
 tyne_rivers_os <- st_geometry(st_read("data/tyne_rivers.shp"))
 tyne_rivers_os <- st_set_crs(tyne_rivers_os, 27700)
 tyne_rivers_ll <- st_transform(tyne_rivers_os, 4326)
+
+saveRDS(topmod_30catch_sf_ll, "data/topmod_30catch.RDS")
+saveRDS(tyne_rivers_ll, "data/tyne_rivers.RDS")

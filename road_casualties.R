@@ -25,5 +25,9 @@ RTA_ll <-
 
 RTA_daily_counts <- RTA_ll %>% group_by(day = floor_date(Date), `Casualty Severity`) %>% 
   summarise(daily_RTA = n())
+
+saveRDS(RTA_ll, "data/RTA_ll.RDS")
+saveRDS(RTA_daily_counts, "data/RTA_daily_counts.RDS")
+
 # ggplot(RTA_daily_counts, aes(x=day, y=daily_RTA, color = `Casualty Severity`)) +
 #          geom_smooth()
