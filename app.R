@@ -194,30 +194,7 @@ server <- function(input, output, session) {
   output$out1 <- renderPrint(input$nbn_select)
   
   output$census_map <- renderLeaflet({ # Server AgCensus ####
-    # Colours: http://colorbrewer2.org/#type=sequential&scheme=YlGn&n=3 
-    # palcow <- colorBin(c("#FFFFCC", "#c2e699", "#78c679", "#31a354", "#006837"),
-    #                    values(AgCensus_cows_ll), na.color = "transparent")
-    # palsheep <- colorBin(c("#FFFFCC", "#c2e699", "#78c679", "#31a354", "#006837"),
-    #                      values(AgCensus_sheep_ll), na.color = "transparent")
-    # 
-    # leaflet(options = leafletOptions(minZoom = 8, zoomDelta=0.05, zoomSnap=0.05)) %>%
-    #   addTiles(group = "OSM (default)") %>%
-    #   addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
-    #   addRasterImage(AgCensus_cows_ll,  colors=palcow,   group="Cattle", opacity=0.6) %>% 
-    #   addRasterImage(AgCensus_sheep_ll, colors=palsheep, group="Sheep", opacity=0.6) %>%
-    #   addLayersControl(
-    #     baseGroups = c("OSM (default)", "Satellite"),
-    #     overlayGroups = c("Cattle", "Sheep"),
-    #     options = layersControlOptions(collapsed = FALSE))  %>%
-    #   addLegend(pal=palcow,   values=values(AgCensus_cows_ll), title="Cattle/km", group="Cattle") %>%
-    #   addLegend(pal=palsheep, values=values(AgCensus_sheep_ll), title="Sheep/km", group="Sheep") %>%
-    #   setView( lng = -2, lat = 55, zoom = 8.6)  %>%
-    #   setMaxBounds(lng1 = -1.5,
-    #                lat1 = 54.5,
-    #                lng2 = -2.5,
-    #                lat2 = 55.5) %>% 
-    #   hideGroup("Sheep")
-    paltcow <- colorBin(c("#FFFFCC", "#c2e699", "#78c679", "#31a354", "#006837"),
+   paltcow <- colorBin(c("#FFFFCC", "#c2e699", "#78c679", "#31a354", "#006837"),
                         values(agcensus$tot_cattle), na.color = "transparent")
     palbeef <- colorBin(c("#FFFFCC", "#c2e699", "#78c679", "#31a354", "#006837"),
                         values(agcensus$beef), na.color = "transparent")
