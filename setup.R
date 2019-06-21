@@ -23,5 +23,10 @@ nbn_araneae <- dplyr::mutate(nbn_araneae, lat=st_coordinates(nbn_araneae)[,2],
                              lng = st_coordinates(nbn_araneae)[,1])
 nbn_araneae_family_lst <- as.list(c("All records", sort(as.character(unique(nbn_araneae$family)))))
 names(nbn_araneae_family_lst) <- c("All records", sort(as.character(unique(nbn_araneae$family))))
+nbn_mammals <- readRDS("data/nbn_mammals.RDS")
+nbn_mammals <- dplyr::mutate(nbn_mammals, lat=st_coordinates(nbn_mammals)[,2],
+                             lng = st_coordinates(nbn_mammals)[,1])
+nbn_mammals_family_lst <- as.list(c("All records", sort(as.character(unique(nbn_mammals$family)))))
+names(nbn_mammals_family_lst) <- c("All records", sort(as.character(unique(nbn_mammals$family))))
 
   

@@ -55,11 +55,18 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                     h3("The National Biodiversity Atlas is used to collect `citizen science` data
                        on species-distributions throughout the UK. Users will eventually be able
                        to use the Rural Observatory to overlay species records with environmental
-                       data, plot changes over time, etc. The beta version displays data for just
-                       one group of species, the Diptera (true flies) but it will eventually 
-                       provide access to records for numerous plants and animals across the region."),
-                    selectInput(inputId = "nbn_select", h2("Family"), 
-                                choices = nbn_araneae_family_lst) #,
+                       data, plot changes over time, etc. The beta version displays data for 
+                       one group of spiders, insects, birds and mammals, but it will eventually 
+                       provide access to records for other groups."),
+                    selectInput(inputId = "nbn_select_major", h2("Group of species"),
+                                choices = c(#"Birds" = "birds",
+                                            "Mammals" = "mammals",
+                                            #"Insects" = "insects",
+                                            "Spiders" = "spiders")),
+                    selectInput(inputId = "nbn_select_order", h2("Order"),
+                                choices = NULL),
+                    selectInput(inputId = "nbn_select_family", h2("Family"), 
+                                choices = NULL) 
                   ),
                   mainPanel(
                     leafletOutput("nbn_map")
@@ -156,24 +163,62 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
 server <- function(input, output, session) {
   
   output$nbn_map  <- renderLeaflet({ # Server Biodiversity ####
-    nbn_subset_plot <- reactive(
-      if(input$nbn_select=="All records"){
-        nbn_araneae
+    nbn_order_choices <- reactive(
+      if(input$nbn_select_major == "mammals"){
+        nbn_mammals_order_lst <- as.list(sort(as.character(unique(nbn_mammals$order))))
+        names(nbn_mammals_order_lst) <- sort(as.character(unique(nbn_mammals$order)))
       } else {
-        dplyr::filter(nbn_araneae, family==input$nbn_select)
+        nbn_araneae_order_lst <- as.list(sort(as.character(unique(nbn_araneae$order))))
+        names(nbn_araneae_order_lst) <- sort(as.character(unique(nbn_araneae$order)))
       }
     )
     
-    leaflet(options = leafletOptions(minZoom = 1, maxZoom = 10, zoomDelta=0.05, zoomSnap=0.05)) %>%
-      addTiles(group = "OSM (default)") %>%
-      addCircleMarkers(lng = nbn_subset_plot()$lng, lat = nbn_subset_plot()$lat,
-                       popup = paste("<b>Taxonomy:</b> ", nbn_subset_plot()$scntfcN,"<br/>",
-                                    "<b>Year:</b> ",  nbn_subset_plot()$strtDtY, "<br/>",
-                                    "<b>Recorder:</b> ", nbn_subset_plot()$dtPrvdr)) %>%
-      fitBounds(lng1 = as.numeric(st_bbox(ro_region)[1]),
-                   lat1 = as.numeric(st_bbox(ro_region)[2]),
-                   lng2 = as.numeric(st_bbox(ro_region)[3]),
-                   lat2 = as.numeric(st_bbox(ro_region)[4]))
+    nbn_family_choices <- reactive({
+      if(input$nbn_select_order == "Araneae"){
+      # families <- dplyr::filter(nbn_araneae, order==input$nbn_order_select)
+      # nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
+      # names(nbn_family_lst) <- sort(as.character(unique(families$family)))
+      #list("Test" = "test")
+        dplyr::filter(nbn_araneae, order==input$nbn_order_select) %>% 
+          dplyr::select(as.list(sort(as.character(unique(family)))))
+        
+      }
+    })
+    
+    observe({
+      updateSelectInput(session = session, inputId = "nbn_select_order", choices = nbn_order_choices())
+    })
+    observe({
+      updateSelectInput(session = session, inputId = "nbn_select_family", choices = nbn_family_choices())
+    })
+    # nbn_subset_plot <- reactive(
+    #   if(input$nbn_select_major == "spiders"){
+    #     if(input$nbn_select=="All records"){
+    #       nbn_araneae
+    #     } else {
+    #       dplyr::filter(nbn_araneae, family==input$nbn_select)
+    #     }
+    #   } else {
+    #     if(input$nbn_select_major == "mammals"){
+    #       if(input$nbn_select=="All records"){
+    #         nbn_mammals
+    #       } else {
+    #         dplyr::filter(nbn_mammals, family==input$nbn_select)
+    #       }
+    #     }
+    #   }
+    # )
+    
+    # leaflet(options = leafletOptions(minZoom = 1, maxZoom = 10, zoomDelta=0.05, zoomSnap=0.05)) %>%
+    #   addTiles(group = "OSM (default)") %>%
+    #   addCircleMarkers(lng = nbn_subset_plot()$lng, lat = nbn_subset_plot()$lat,
+    #                    popup = paste("<b>Taxonomy:</b> ", nbn_subset_plot()$scntfcN,"<br/>",
+    #                                 "<b>Year:</b> ",  nbn_subset_plot()$strtDtY, "<br/>",
+    #                                 "<b>Recorder:</b> ", nbn_subset_plot()$dtPrvdr)) %>%
+    #   fitBounds(lng1 = as.numeric(st_bbox(ro_region)[1]),
+    #                lat1 = as.numeric(st_bbox(ro_region)[2]),
+    #                lng2 = as.numeric(st_bbox(ro_region)[3]),
+    #                lat2 = as.numeric(st_bbox(ro_region)[4]))
 })
   
   output$out1 <- renderPrint(input$nbn_select)

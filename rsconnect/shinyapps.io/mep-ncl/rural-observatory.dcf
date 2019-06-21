@@ -5,8 +5,8 @@ account: mep-ncl
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 622248
-bundleId: 1961895
+bundleId: 2169146
 url: https://mep-ncl.shinyapps.io/rural-observatory/
-when: 1553460082.67812
+when: 1561124212.40059
 asMultiple: FALSE
 asStatic: FALSE
