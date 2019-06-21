@@ -8,22 +8,8 @@ library(rgdal)
 library(raster)
 library(dplyr)
 
-rm(list=ls())
-
-
-r_colors <- rgb(t(col2rgb(colors()) / 255))
-names(r_colors) <- colors()
-
-topmod_30catch_sf_ll <- readRDS("data/topmod_30catch.RDS")
-tyne_rivers_ll <- readRDS("data/tyne_rivers.RDS")
-AgCensus_sheep_ll <- readRDS("data/AgCensus_sheep_ll.RDS")
-AgCensus_cows_ll  <- readRDS("data/AgCensus_cows_ll.RDS")
-nbn_subset_ll <- readRDS("data/nbn_subset_ll.RDS")
-nbn_family_lst <- readRDS("data/nbn_family_lst.RDS")
-RTA_ll <- readRDS("data/RTA_ll.RDS")
-RTA_daily_counts <- readRDS("data/RTA_daily_counts.RDS")
-ro_region <- readRDS("data/rural_observatory.RDS")
-agcensus <- readRDS("data/agcensus.RDS")
+source("setup.R")
+source("road_casualties.R")
 
 ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
   dashboardHeader(title="Rural Observatory"),
@@ -73,7 +59,7 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                        one group of species, the Diptera (true flies) but it will eventually 
                        provide access to records for numerous plants and animals across the region."),
                     selectInput(inputId = "nbn_select", h2("Family"), 
-                                choices = nbn_family_lst) #,
+                                choices = nbn_araneae_family_lst) #,
                   ),
                   mainPanel(
                     leafletOutput("nbn_map")
@@ -172,24 +158,23 @@ server <- function(input, output, session) {
   output$nbn_map  <- renderLeaflet({ # Server Biodiversity ####
     nbn_subset_plot <- reactive(
       if(input$nbn_select=="All records"){
-        nbn_subset_ll
+        nbn_araneae
       } else {
-        dplyr::filter(nbn_subset_ll, family==input$nbn_select)
+        dplyr::filter(nbn_araneae, family==input$nbn_select)
       }
     )
-
-    leaflet(options = leafletOptions(minZoom = 8, zoomDelta=0.05, zoomSnap=0.05)) %>%
+    
+    leaflet(options = leafletOptions(minZoom = 1, maxZoom = 10, zoomDelta=0.05, zoomSnap=0.05)) %>%
       addTiles(group = "OSM (default)") %>%
       addCircleMarkers(lng = nbn_subset_plot()$lng, lat = nbn_subset_plot()$lat,
-                       popup = paste("<b>Taxonomy:</b> ", nbn_subset_plot()$spp,"<br/>",
-                                    "<b>Year:</b> ",  nbn_subset_plot()$year, "<br/>",
-                                    "<b>Recorder:</b> ", nbn_subset_plot()$recorder)) %>% 
-      setView(lng = -2, lat = 55, zoom = 8.6)  %>%
-      setMaxBounds(lng1 = -1.5,
-                   lat1 = 54.5,
-                   lng2 = -2.5,
-                   lat2 = 55.5)
-  })
+                       popup = paste("<b>Taxonomy:</b> ", nbn_subset_plot()$scntfcN,"<br/>",
+                                    "<b>Year:</b> ",  nbn_subset_plot()$strtDtY, "<br/>",
+                                    "<b>Recorder:</b> ", nbn_subset_plot()$dtPrvdr)) %>%
+      fitBounds(lng1 = as.numeric(st_bbox(ro_region)[1]),
+                   lat1 = as.numeric(st_bbox(ro_region)[2]),
+                   lng2 = as.numeric(st_bbox(ro_region)[3]),
+                   lat2 = as.numeric(st_bbox(ro_region)[4]))
+})
   
   output$out1 <- renderPrint(input$nbn_select)
   

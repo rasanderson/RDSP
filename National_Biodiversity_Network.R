@@ -15,6 +15,10 @@ nbn_family_lst <- nbn_family_lst[nbn_family_lst[] != ""] # Remove un-named recor
 saveRDS(nbn_subset_ll, "data/nbn_subset_ll.RDS")
 saveRDS(nbn_family_lst, "data/nbn_family_lst.RDS")
 
+nbn_araneae <- readRDS("data/nbn_araneae.RDS")
+nbn_araneae_family_lst <- as.list(c("All records", sort(as.character(unique(nbn_araneae$family)))))
+names(nbn_araneae_family_lst) <- c("All records", sort(as.character(unique(nbn_araneae$family))))
+
 # library(leaflet)
 # library(mapview)
 # nbn_subset_ll <- dplyr::filter(subset_ll, year==1978, genus=="Machimus")
