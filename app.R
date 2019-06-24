@@ -62,7 +62,7 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                                 choices = c(#"Birds" = "birds",
                                             "Mammals" = "mammals",
                                             #"Insects" = "insects",
-                                            "Spiders" = "spiders")),
+                                            "Spiders (Araneae)" = "spiders")),
                     selectInput(inputId = "nbn_select_order", h2("Order"),
                                 choices = NULL),
                     selectInput(inputId = "nbn_select_family", h2("Family"), 
@@ -163,7 +163,7 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
 server <- function(input, output, session) {
   
   output$nbn_map  <- renderLeaflet({ # Server Biodiversity ####
-    nbn_order_choices <- reactive(
+    nbn_order_choices <- eventReactive(input$nbn_select_major, {
       if(input$nbn_select_major == "mammals"){
         nbn_mammals_order_lst <- as.list(sort(as.character(unique(nbn_mammals$order))))
         names(nbn_mammals_order_lst) <- sort(as.character(unique(nbn_mammals$order)))
@@ -171,26 +171,58 @@ server <- function(input, output, session) {
         nbn_araneae_order_lst <- as.list(sort(as.character(unique(nbn_araneae$order))))
         names(nbn_araneae_order_lst) <- sort(as.character(unique(nbn_araneae$order)))
       }
+    }
     )
     
-    nbn_family_choices <- reactive({
-      if(input$nbn_select_order == "Araneae"){
-      # families <- dplyr::filter(nbn_araneae, order==input$nbn_order_select)
-      # nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
-      # names(nbn_family_lst) <- sort(as.character(unique(families$family)))
-      #list("Test" = "test")
-        dplyr::filter(nbn_araneae, order==input$nbn_order_select) %>% 
-          dplyr::select(as.list(sort(as.character(unique(family)))))
-        
+    # nbn_family_choices <- reactive({
+    #   if(input$nbn_select_order == "Araneae"){
+    #   # families <- dplyr::filter(nbn_araneae, order==input$nbn_order_select)
+    #   # nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
+    #   # names(nbn_family_lst) <- sort(as.character(unique(families$family)))
+    #   #list("Test" = "test")
+    #     dplyr::filter(nbn_araneae, order==input$nbn_order_select) %>% 
+    #       dplyr::select(as.list(sort(as.character(unique(family)))))
+    #     
+    #   }
+    # })
+    
+    observeEvent(input$nbn_select_major, {
+ #   observe({
+      selected_order <- input$nbn_select_order
+      if(selected_order == "Araneae"){
+        families <- dplyr::filter(nbn_araneae, order==selected_order)
+        nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
+        names(nbn_family_lst) <- sort(as.character(unique(families$family)))
+        reduced_nbn <- dplyr::filter(nbn_araneae, order==selected_order) 
+      } else {
+        families <- dplyr::filter(nbn_mammals, order==selected_order)
+        nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
+        names(nbn_family_lst) <- sort(as.character(unique(families$family)))
+        reduced_nbn <- dplyr::filter(nbn_mammals, order==selected_order) 
       }
+      updateSelectInput(session, inputId = "nbn_select_order", choices = nbn_order_choices())
     })
     
-    observe({
-      updateSelectInput(session = session, inputId = "nbn_select_order", choices = nbn_order_choices())
+    observeEvent(input$nbn_select_order, {
+      selected_order <- input$nbn_select_order
+      if(selected_order == "Araneae"){
+        families <- dplyr::filter(nbn_araneae, order==selected_order)
+        nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
+        names(nbn_family_lst) <- sort(as.character(unique(families$family)))
+        reduced_nbn <- dplyr::filter(nbn_araneae, order==selected_order)
+      } else {
+        families <- dplyr::filter(nbn_mammals, order==selected_order)
+        nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
+        names(nbn_family_lst) <- sort(as.character(unique(families$family)))
+        reduced_nbn <- dplyr::filter(nbn_mammals, order==selected_order)
+      }
+      updateSelectInput(session, inputId = "nbn_select_family", choices = nbn_family_lst)
     })
-    observe({
-      updateSelectInput(session = session, inputId = "nbn_select_family", choices = nbn_family_choices())
-    })
+    
+    
+    # observe({
+    #   updateSelectInput(session = session, inputId = "nbn_select_family", choices = nbn_family_choices())
+    # })
     # nbn_subset_plot <- reactive(
     #   if(input$nbn_select_major == "spiders"){
     #     if(input$nbn_select=="All records"){
