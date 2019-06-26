@@ -162,7 +162,7 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
 
 server <- function(input, output, session) {
   
-  output$nbn_map  <- renderLeaflet({ # Server Biodiversity ####
+    # Server Biodiversity ####
     nbn_order_choices <- eventReactive(input$nbn_select_major, {
       if(input$nbn_select_major == "mammals"){
         nbn_mammals_order_lst <- as.list(sort(as.character(unique(nbn_mammals$order))))
@@ -171,23 +171,9 @@ server <- function(input, output, session) {
         nbn_araneae_order_lst <- as.list(sort(as.character(unique(nbn_araneae$order))))
         names(nbn_araneae_order_lst) <- sort(as.character(unique(nbn_araneae$order)))
       }
-    }
-    )
-    
-    # nbn_family_choices <- reactive({
-    #   if(input$nbn_select_order == "Araneae"){
-    #   # families <- dplyr::filter(nbn_araneae, order==input$nbn_order_select)
-    #   # nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
-    #   # names(nbn_family_lst) <- sort(as.character(unique(families$family)))
-    #   #list("Test" = "test")
-    #     dplyr::filter(nbn_araneae, order==input$nbn_order_select) %>% 
-    #       dplyr::select(as.list(sort(as.character(unique(family)))))
-    #     
-    #   }
-    # })
+    })
     
     observeEvent(input$nbn_select_major, {
- #   observe({
       selected_order <- input$nbn_select_order
       if(selected_order == "Araneae"){
         families <- dplyr::filter(nbn_araneae, order==selected_order)
@@ -218,43 +204,31 @@ server <- function(input, output, session) {
       }
       updateSelectInput(session, inputId = "nbn_select_family", choices = nbn_family_lst)
     })
+
+    output$nbn_map  <- renderLeaflet({
+      nbn_subset_plot <- reactive({
+        if(input$nbn_select_major == "spiders"){
+          return(dplyr::filter(nbn_araneae, order==input$nbn_select_order, family==input$nbn_select_family))
+        } else {
+          if(input$nbn_select_major == "mammals"){
+            return(dplyr::filter(nbn_mammals, order==input$nbn_select_order, family==input$nbn_select_family))
+          }
+        }
+      })
+      leaflet(options = leafletOptions(minZoom = 1, maxZoom = 10, zoomDelta=0.05, zoomSnap=0.05)) %>%
+        addTiles(group = "OSM (default)") %>%
+        addCircleMarkers(lng = nbn_subset_plot()$lng, lat = nbn_subset_plot()$lat,
+                         popup = paste("<b>Taxonomy:</b>", nbn_subset_plot()$scntfcN,"<br/>",
+                                       "<b>Common name:</b>", nbn_subset_plot()$commnNm, "<br/>",
+                                       "<b>Year:</b> ",  nbn_subset_plot()$strtDtY, "<br/>",
+                                       "<b>Recorder:</b> ", nbn_subset_plot()$dtPrvdr)) %>%
+        fitBounds(lng1 = as.numeric(st_bbox(ro_region)[1]),
+                  lat1 = as.numeric(st_bbox(ro_region)[2]),
+                  lng2 = as.numeric(st_bbox(ro_region)[3]),
+                  lat2 = as.numeric(st_bbox(ro_region)[4]))
+    })
     
-    
-    # observe({
-    #   updateSelectInput(session = session, inputId = "nbn_select_family", choices = nbn_family_choices())
-    # })
-    # nbn_subset_plot <- reactive(
-    #   if(input$nbn_select_major == "spiders"){
-    #     if(input$nbn_select=="All records"){
-    #       nbn_araneae
-    #     } else {
-    #       dplyr::filter(nbn_araneae, family==input$nbn_select)
-    #     }
-    #   } else {
-    #     if(input$nbn_select_major == "mammals"){
-    #       if(input$nbn_select=="All records"){
-    #         nbn_mammals
-    #       } else {
-    #         dplyr::filter(nbn_mammals, family==input$nbn_select)
-    #       }
-    #     }
-    #   }
-    # )
-    
-    # leaflet(options = leafletOptions(minZoom = 1, maxZoom = 10, zoomDelta=0.05, zoomSnap=0.05)) %>%
-    #   addTiles(group = "OSM (default)") %>%
-    #   addCircleMarkers(lng = nbn_subset_plot()$lng, lat = nbn_subset_plot()$lat,
-    #                    popup = paste("<b>Taxonomy:</b> ", nbn_subset_plot()$scntfcN,"<br/>",
-    #                                 "<b>Year:</b> ",  nbn_subset_plot()$strtDtY, "<br/>",
-    #                                 "<b>Recorder:</b> ", nbn_subset_plot()$dtPrvdr)) %>%
-    #   fitBounds(lng1 = as.numeric(st_bbox(ro_region)[1]),
-    #                lat1 = as.numeric(st_bbox(ro_region)[2]),
-    #                lng2 = as.numeric(st_bbox(ro_region)[3]),
-    #                lat2 = as.numeric(st_bbox(ro_region)[4]))
-})
-  
-  output$out1 <- renderPrint(input$nbn_select)
-  
+
   output$census_map <- renderLeaflet({ # Server AgCensus ####
    paltcow <- colorBin(c("#FFFFCC", "#c2e699", "#78c679", "#31a354", "#006837"),
                         values(agcensus$tot_cattle), na.color = "transparent")
