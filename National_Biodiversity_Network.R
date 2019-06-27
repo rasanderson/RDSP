@@ -1,23 +1,23 @@
-records_nbn <- readRDS("data/Diptera.RDS")
-# class(records_nbn)
-# library(sf)
-# library(dplyr)
-records_ll <- st_as_sf(records_nbn$data, coords=c("longitudeWGS84", "latitudeWGS84"))
-records_ll <- st_set_crs(records_ll, 4326)
-nbn_subset_ll <- records_ll %>% 
-  dplyr::select(rank, order, family, genus, spp=scientificNameOriginal, year=endYear, recorder) %>% 
-  mutate(lng=st_coordinates(records_ll)[,1], lat=st_coordinates(records_ll)[,2])
-
-nbn_family_lst <- as.list(c("All records", sort(unique(nbn_subset_ll$family))))
-names(nbn_family_lst) <- c("All records", sort(unique(nbn_subset_ll$family)))
-nbn_family_lst <- nbn_family_lst[nbn_family_lst[] != ""] # Remove un-named records                        
-
-saveRDS(nbn_subset_ll, "data/nbn_subset_ll.RDS")
-saveRDS(nbn_family_lst, "data/nbn_family_lst.RDS")
-
-nbn_araneae <- readRDS("data/nbn_araneae.RDS")
-nbn_araneae_family_lst <- as.list(c("All records", sort(as.character(unique(nbn_araneae$family)))))
-names(nbn_araneae_family_lst) <- c("All records", sort(as.character(unique(nbn_araneae$family))))
+# records_nbn <- readRDS("data/Diptera.RDS")
+# # class(records_nbn)
+# # library(sf)
+# # library(dplyr)
+# records_ll <- st_as_sf(records_nbn$data, coords=c("longitudeWGS84", "latitudeWGS84"))
+# records_ll <- st_set_crs(records_ll, 4326)
+# nbn_subset_ll <- records_ll %>% 
+#   dplyr::select(rank, order, family, genus, spp=scientificNameOriginal, year=endYear, recorder) %>% 
+#   mutate(lng=st_coordinates(records_ll)[,1], lat=st_coordinates(records_ll)[,2])
+# 
+# nbn_family_lst <- as.list(c("All records", sort(unique(nbn_subset_ll$family))))
+# names(nbn_family_lst) <- c("All records", sort(unique(nbn_subset_ll$family)))
+# nbn_family_lst <- nbn_family_lst[nbn_family_lst[] != ""] # Remove un-named records                        
+# 
+# saveRDS(nbn_subset_ll, "data/nbn_subset_ll.RDS")
+# saveRDS(nbn_family_lst, "data/nbn_family_lst.RDS")
+# 
+# nbn_araneae <- readRDS("data/nbn_araneae.RDS")
+# nbn_araneae_family_lst <- as.list(c("All records", sort(as.character(unique(nbn_araneae$family)))))
+# names(nbn_araneae_family_lst) <- c("All records", sort(as.character(unique(nbn_araneae$family))))
 
 # library(leaflet)
 # library(mapview)
