@@ -9,10 +9,10 @@ library(raster)
 library(dplyr)
 
 source("setup.R")
-source("road_casualties.R")
+#source("road_casualties.R")
 
-ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
-  dashboardHeader(title="Rural Observatory"),
+ui <- dashboardPage(title = "Newcastle University Rural Data Science PlatForm" ,
+  dashboardHeader(title="Rural Data Science Platform"),
   dashboardSidebar(
     sidebarMenu(
       menuItem("Home", tabName="home", icon=icon("home")),
@@ -26,16 +26,16 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
   dashboardBody(
     tabItems(
       tabItem(tabName = "home", # UI Home ####
-              h1("Newcastle University Rural Observatory (beta)"),
+              h1("Newcastle University: Rural Data Science Platform (beta)"),
               img(src="cheviots.png"),
               h2("Introduction"),
-              h3("Welcome to the Rural Observatory (beta). This website give access
+              h3("Welcome to the Rural Data Science Platform (RDSP). This website give access
                 to physical, environmental, socio-economic and medical data for
                 North East England. Navigate through the website using the menu 
                 bars on the left."),
               hr(),
               h3("This website has been developed part of a pilot study to explore the potential for a
-                Rural Observatory system. It will provide a repository for data, collected from
+                Rural Data Science Platform. It will provide a repository for data, collected from
                 national, regional, local and University sources. It will also integrate with 
                 real-time models, to allow end-users to explore the potential impacts of different
                 scenarios on the environmental, socio-economics, and human health in rural areas.")
@@ -50,11 +50,13 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                  interest, and click on points to obtain details about species,
                  year of collection and recorder (where available)."),
               fluidPage(
-                sidebarLayout(
-                  sidebarPanel(
+                # sidebarLayout(
+                #   sidebarPanel(
+                fluidRow(
+                  column(6,
                     h3("The National Biodiversity Atlas is used to collect `citizen science` data
                        on species-distributions throughout the UK. Users will eventually be able
-                       to use the Rural Observatory to overlay species records with environmental
+                       to use the Rural Data Science Platform to overlay species records with environmental
                        data, plot changes over time, etc. The beta version displays data for 
                        one group of spiders, insects, birds and mammals, but it will eventually 
                        provide access to records for other groups."),
@@ -68,7 +70,8 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                     selectInput(inputId = "nbn_select_family", h2("Family"), 
                                 choices = NULL) 
                   ),
-                  mainPanel(
+                  # mainPanel(
+                  column(6, 
                     leafletOutput("nbn_map")
                   )
                 )
@@ -144,13 +147,13 @@ ui <- dashboardPage(title = "Newcastle University Rural Observatory" ,
                     h3("Click on the symbols to display information about the types of vehicle
                        involved in the RTA."),
                     selectInput(inputId = "RTA_severity_sel", h2("Severity"), 
-                                choices = RTA_severity_lst) #,
+                                choices = c("Serious", "Fatal")) #,
                   ),
                   mainPanel(
                     h3("Distribution map"),
-                    leafletOutput("RTA_map"),
-                    h3("Changes over time"),
-                    plotOutput("RTA_plot")
+                    leafletOutput("RTA_map") #,
+                    # h3("Changes over time"),
+                    # plotOutput("RTA_plot")
                   )
                 )
               )
@@ -304,42 +307,44 @@ server <- function(input, output, session) {
   
   output$RTA_map <- renderLeaflet({ # Server RTA ####
     RTA_severity_plot <- reactive(
-      if(input$RTA_severity_sel=="All records"){
+     # if(input$RTA_severity_sel=="All records"){
         RTA_ll
-      } else {
-        dplyr::filter(RTA_ll, `Casualty Severity`==input$RTA_severity_sel)
-      }
+      #} else {
+      #  dplyr::filter(RTA_ll, accident_severity==input$RTA_severity_sel)
+      #}
     )
     
     leaflet(options = leafletOptions(minZoom = 8, zoomDelta=0.05, zoomSnap=0.05)) %>%
       addTiles(group = "OSM (default)") %>% 
-      addCircleMarkers(lng = RTA_severity_plot()$lng, lat = RTA_severity_plot()$lat,
+      addCircleMarkers(lng = st_coordinates(RTA_severity_plot())[,1],
+                       lat = st_coordinates(RTA_severity_plot())[,2],
                        color = RTA_severity_plot()$symbol_color,
-                       popup = paste("<b>Vehicle:</b> ", RTA_severity_plot()$`Vehicle Type`,"<br/>",
-                                     "<b>Date:</b> ",  RTA_severity_plot()$Date, "<br/>",
-                                     "<b>Severity:</b> ", RTA_severity_plot()$`Casualty Severity`)) %>% 
+                       popup = paste("<b>Vehicle:</b> ", RTA_severity_plot()$vehicle_type,"<br/>",
+                                     "<b>Date:</b> ",  RTA_severity_plot()$date, "<br/>",
+                                     #"<b>Time:</b> ", stringr::str_sub(hms::as.hms(RTA_severity_plot()$time), 1, 5), "<br/>",
+                                     "<b>Severity:</b> ", RTA_severity_plot()$accident_severity)) %>% 
       
-      #setView(lng = -2, lat = 55, zoom = 8.6)  %>%
+      setView(lng = -2, lat = 55, zoom = 8.6)  %>%
       setMaxBounds(lng1 = -3,
                    lat1 = 54.5,
                    lng2 = -1.5,
                    lat2 = 57 )
   })
   
-  output$RTA_plot <- renderPlot({
-    RTA_fig <- reactive(
-      if(input$RTA_severity_sel == "All records"){
-         RTA_daily_counts
-      }else{
-        dplyr::filter(RTA_daily_counts, `Casualty Severity`==input$RTA_severity_sel)
-      }
-    )
-    #plot(RTA_fig()$day, RTA_fig()$daily_RTA)
-    ggplot(RTA_fig(), aes(x=day, y=daily_RTA)) +
-      geom_smooth() +
-      ylab("Number of RTA per day") +
-      xlab("Date")
-  })
+  # output$RTA_plot <- renderPlot({
+  #   RTA_fig <- reactive(
+  #     if(input$RTA_severity_sel == "All records"){
+  #        RTA_daily_counts
+  #     }else{
+  #       dplyr::filter(RTA_daily_counts, `Casualty Severity`==input$RTA_severity_sel)
+  #     }
+  #   )
+  #   #plot(RTA_fig()$day, RTA_fig()$daily_RTA)
+  #   ggplot(RTA_fig(), aes(x=day, y=daily_RTA)) +
+  #     geom_smooth() +
+  #     ylab("Number of RTA per day") +
+  #     xlab("Date")
+  # })
 }
 
 shinyApp(ui, server)
