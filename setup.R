@@ -26,4 +26,9 @@ nbn_mammals <- dplyr::mutate(nbn_mammals, lat=st_coordinates(nbn_mammals)[,2],
                              lng = st_coordinates(nbn_mammals)[,1])
 nbn_mammals_family_lst <- as.list(c("All records", sort(as.character(unique(nbn_mammals$family)))))
 names(nbn_mammals_family_lst) <- c("All records", sort(as.character(unique(nbn_mammals$family))))
+nbn_insecta <- readRDS("data/nbn_insecta17.RDS")
+nbn_insecta <- dplyr::mutate(nbn_insecta, lat=st_coordinates(nbn_insecta)[,2],
+                             lng = st_coordinates(nbn_insecta)[,1])
+nbn_insecta_family_lst <- as.list(c("All records", sort(as.character(unique(nbn_insecta$family)))))
+names(nbn_insecta_family_lst) <- c("All records", sort(as.character(unique(nbn_insecta$family))))
 RTA_ll <- readRDS("data/stats19.RDS")

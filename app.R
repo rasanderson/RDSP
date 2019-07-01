@@ -63,7 +63,7 @@ ui <- dashboardPage(title = "Newcastle University Rural Data Science PlatForm" ,
                     selectInput(inputId = "nbn_select_major", h2("Group of species"),
                                 choices = c(#"Birds" = "birds",
                                             "Mammals" = "mammals",
-                                            #"Insects" = "insects",
+                                            "Insects" = "insects",
                                             "Spiders (Araneae)" = "spiders")),
                     selectInput(inputId = "nbn_select_order", h2("Order"),
                                 choices = NULL),
@@ -170,9 +170,12 @@ server <- function(input, output, session) {
       if(input$nbn_select_major == "mammals"){
         nbn_mammals_order_lst <- as.list(sort(as.character(unique(nbn_mammals$order))))
         names(nbn_mammals_order_lst) <- sort(as.character(unique(nbn_mammals$order)))
-      } else {
+      } else if (input$nbn_select_major == "spiders"){
         nbn_araneae_order_lst <- as.list(sort(as.character(unique(nbn_araneae$order))))
         names(nbn_araneae_order_lst) <- sort(as.character(unique(nbn_araneae$order)))
+      } else {
+        nbn_insecta_order_lst <- as.list(sort(as.character(unique(nbn_insecta$order))))
+        names(nbn_insecta_order_lst) <- sort(as.character(unique(nbn_insecta$order)))
       }
     })
     
@@ -183,11 +186,16 @@ server <- function(input, output, session) {
         nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
         names(nbn_family_lst) <- sort(as.character(unique(families$family)))
         reduced_nbn <- dplyr::filter(nbn_araneae, order==selected_order) 
-      } else {
+      } else if (input$nbn_select_major == "mammals") {
         families <- dplyr::filter(nbn_mammals, order==selected_order)
         nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
         names(nbn_family_lst) <- sort(as.character(unique(families$family)))
         reduced_nbn <- dplyr::filter(nbn_mammals, order==selected_order) 
+      } else {
+        families <- dplyr::filter(nbn_insecta, order==selected_order)
+        nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
+        names(nbn_family_lst) <- sort(as.character(unique(families$family)))
+        reduced_nbn <- dplyr::filter(nbn_insecta, order==selected_order) 
       }
       updateSelectInput(session, inputId = "nbn_select_order", choices = nbn_order_choices())
     })
@@ -199,11 +207,16 @@ server <- function(input, output, session) {
         nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
         names(nbn_family_lst) <- sort(as.character(unique(families$family)))
         reduced_nbn <- dplyr::filter(nbn_araneae, order==selected_order)
-      } else {
+      } else if (input$nbn_select_major == "mammals"){
         families <- dplyr::filter(nbn_mammals, order==selected_order)
         nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
         names(nbn_family_lst) <- sort(as.character(unique(families$family)))
         reduced_nbn <- dplyr::filter(nbn_mammals, order==selected_order)
+      } else {
+        families <- dplyr::filter(nbn_insecta, order==selected_order)
+        nbn_family_lst <- as.list(sort(as.character(unique(families$family))))
+        names(nbn_family_lst) <- sort(as.character(unique(families$family)))
+        reduced_nbn <- dplyr::filter(nbn_insecta, order==selected_order)
       }
       updateSelectInput(session, inputId = "nbn_select_family", choices = nbn_family_lst)
     })
@@ -212,10 +225,10 @@ server <- function(input, output, session) {
       nbn_subset_plot <- reactive({
         if(input$nbn_select_major == "spiders"){
           return(dplyr::filter(nbn_araneae, order==input$nbn_select_order, family==input$nbn_select_family))
+        } else if (input$nbn_select_major == "mammals") {
+          return(dplyr::filter(nbn_mammals, order==input$nbn_select_order, family==input$nbn_select_family))
         } else {
-          if(input$nbn_select_major == "mammals"){
-            return(dplyr::filter(nbn_mammals, order==input$nbn_select_order, family==input$nbn_select_family))
-          }
+          return(dplyr::filter(nbn_insecta, order==input$nbn_select_order, family==input$nbn_select_family))
         }
       })
       leaflet(options = leafletOptions(minZoom = 1, maxZoom = 10, zoomDelta=0.05, zoomSnap=0.05)) %>%
