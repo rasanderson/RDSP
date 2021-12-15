@@ -241,11 +241,11 @@ server <- function(input, output, session) {
                          popup = paste("<b>Taxonomy:</b>", nbn_subset_plot()$scntfcN,"<br/>",
                                        "<b>Common name:</b>", nbn_subset_plot()$commnNm, "<br/>",
                                        "<b>Year:</b> ",  nbn_subset_plot()$strtDtY, "<br/>",
-                                       "<b>Recorder:</b> ", nbn_subset_plot()$dtPrvdr)) %>%
-        fitBounds(lng1 = as.numeric(st_bbox(ro_region)[1]),
-                  lat1 = as.numeric(st_bbox(ro_region)[2]),
-                  lng2 = as.numeric(st_bbox(ro_region)[3]),
-                  lat2 = as.numeric(st_bbox(ro_region)[4]))
+                                       "<b>Recorder:</b> ", nbn_subset_plot()$dtPrvdr)) #%>%
+        # fitBounds(lng1 = as.numeric(st_bbox(ro_region)[1]),
+        #           lat1 = as.numeric(st_bbox(ro_region)[2]),
+        #           lng2 = as.numeric(st_bbox(ro_region)[3]),
+        #           lat2 = as.numeric(st_bbox(ro_region)[4]))
     })
     
 
@@ -324,7 +324,7 @@ server <- function(input, output, session) {
   
   output$RTA_map <- renderLeaflet({ # Server RTA ####
     RTA_severity_plot <- reactive(
-     # if(input$RTA_severity_sel=="All records"){
+     #if(input$RTA_severity_sel=="All records"){
         RTA_ll
       #} else {
       #  dplyr::filter(RTA_ll, accident_severity==input$RTA_severity_sel)
@@ -344,20 +344,20 @@ server <- function(input, output, session) {
         position = "topright", 
         options = layersControlOptions(collapsed = FALSE))  %>%
       
-      # addCircleMarkers(lng = st_coordinates(RTA_severity_plot())[,1],
-      #                  lat = st_coordinates(RTA_severity_plot())[,2],
-      #                  color = RTA_severity_plot()$symbol_color,
-      #                  popup = paste("<b>Vehicle:</b> ", RTA_severity_plot()$vehicle_type,"<br/>",
-      #                                "<b>Date:</b> ",  RTA_severity_plot()$date, "<br/>",
-      #                                #"<b>Time:</b> ", stringr::str_sub(hms::as.hms(RTA_severity_plot()$time), 1, 5), "<br/>",
-      #                                "<b>Severity:</b> ", RTA_severity_plot()$accident_severity)) %>% 
+      addCircleMarkers(lng = st_coordinates(RTA_severity_plot())[,1],
+                       lat = st_coordinates(RTA_severity_plot())[,2],
+                       color = RTA_severity_plot()$symbol_color,
+                       popup = paste("<b>Vehicle:</b> ", RTA_severity_plot()$vehicle_type,"<br/>",
+                                     "<b>Date:</b> ",  RTA_severity_plot()$date, "<br/>",
+                                     #"<b>Time:</b> ", stringr::str_sub(hms::as.hms(RTA_severity_plot()$time), 1, 5), "<br/>",
+                                     "<b>Severity:</b> ", RTA_severity_plot()$accident_severity)) %>%
       
-#      setView(lng = -2, lat = 55, zoom = 8.6)  %>%
-      fitBounds(lng1 = as.numeric(st_bbox(ro_region)[1]),
-                lat1 = as.numeric(st_bbox(ro_region)[2]),
-                lng2 = as.numeric(st_bbox(ro_region)[3]),
-                lat2 = as.numeric(st_bbox(ro_region)[4]))
-    
+      setView(lng = -2, lat = 55, zoom = 8.6)  # %>%
+      # fitBounds(lng1 = as.numeric(st_bbox(ro_region)[1]),
+      #           lat1 = as.numeric(st_bbox(ro_region)[2]),
+      #           lng2 = as.numeric(st_bbox(ro_region)[3]),
+      #           lat2 = as.numeric(st_bbox(ro_region)[4]))
+      # 
       # setMaxBounds(lng1 = -3,
       #              lat1 = 54.5,
       #              lng2 = -1.5,
