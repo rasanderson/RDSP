@@ -1,5 +1,6 @@
 # Libraries needed for app
 library(leaflet)
+library(leafem)
 library(mapview)
 library(shiny)
 library(shinydashboard)
@@ -142,14 +143,17 @@ ui <- dashboardPage(title = "Newcastle University Rural Data Science PlatForm" ,
                   help to identify potential accident blackspots, relative to the volume of traffic,
                   road speed limits, class of roads, and types of vehicles involved."),
               fluidPage(
-                sidebarLayout(
-                  sidebarPanel(
+                # sidebarLayout(
+                #   sidebarPanel(
+                fluidRow(
+                  column(6,
                     h3("Click on the symbols to display information about the types of vehicle
                        involved in the RTA."),
                     selectInput(inputId = "RTA_severity_sel", h2("Severity"), 
                                 choices = c("Serious", "Fatal")) #,
                   ),
-                  mainPanel(
+                  #mainPanel(
+                  column(6, 
                     h3("Distribution map"),
                     leafletOutput("RTA_map") #,
                     # h3("Changes over time"),
@@ -327,21 +331,37 @@ server <- function(input, output, session) {
       #}
     )
     
-    leaflet(options = leafletOptions(minZoom = 8, zoomDelta=0.05, zoomSnap=0.05)) %>%
+    leaflet(options = leafletOptions(minZoom = 1, maxZoom = 20, zoomDelta=0.05, zoomSnap=0.05)) %>%
       addTiles(group = "OSM (default)") %>% 
-      addCircleMarkers(lng = st_coordinates(RTA_severity_plot())[,1],
-                       lat = st_coordinates(RTA_severity_plot())[,2],
-                       color = RTA_severity_plot()$symbol_color,
-                       popup = paste("<b>Vehicle:</b> ", RTA_severity_plot()$vehicle_type,"<br/>",
-                                     "<b>Date:</b> ",  RTA_severity_plot()$date, "<br/>",
-                                     #"<b>Time:</b> ", stringr::str_sub(hms::as.hms(RTA_severity_plot()$time), 1, 5), "<br/>",
-                                     "<b>Severity:</b> ", RTA_severity_plot()$accident_severity)) %>% 
+      addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
+      addPolygons(data=transport_primary, group = "Primary roads",
+                  highlightOptions = highlightOptions(weight = 10, color = "red",
+                                               bringToFront = TRUE, fill = FALSE)) %>%
+      addPolygons(data=transport_a_road, group = "A roads") %>% 
+      addLayersControl(
+        baseGroups = c("OSM (default)", "Satellite"),
+        overlayGroups = c("Primary roads", "A roads"),
+        position = "topright", 
+        options = layersControlOptions(collapsed = FALSE))  %>%
       
-      setView(lng = -2, lat = 55, zoom = 8.6)  %>%
-      setMaxBounds(lng1 = -3,
-                   lat1 = 54.5,
-                   lng2 = -1.5,
-                   lat2 = 57 )
+      # addCircleMarkers(lng = st_coordinates(RTA_severity_plot())[,1],
+      #                  lat = st_coordinates(RTA_severity_plot())[,2],
+      #                  color = RTA_severity_plot()$symbol_color,
+      #                  popup = paste("<b>Vehicle:</b> ", RTA_severity_plot()$vehicle_type,"<br/>",
+      #                                "<b>Date:</b> ",  RTA_severity_plot()$date, "<br/>",
+      #                                #"<b>Time:</b> ", stringr::str_sub(hms::as.hms(RTA_severity_plot()$time), 1, 5), "<br/>",
+      #                                "<b>Severity:</b> ", RTA_severity_plot()$accident_severity)) %>% 
+      
+#      setView(lng = -2, lat = 55, zoom = 8.6)  %>%
+      fitBounds(lng1 = as.numeric(st_bbox(ro_region)[1]),
+                lat1 = as.numeric(st_bbox(ro_region)[2]),
+                lng2 = as.numeric(st_bbox(ro_region)[3]),
+                lat2 = as.numeric(st_bbox(ro_region)[4]))
+    
+      # setMaxBounds(lng1 = -3,
+      #              lat1 = 54.5,
+      #              lng2 = -1.5,
+      #              lat2 = 57 )
   })
   
   # output$RTA_plot <- renderPlot({

@@ -1,18 +1,21 @@
 # Agricultural Census
 
-AgCensus_sheep_os <- raster("data/AgCensus_sheep_2km.tif")
-AgCensus_cows_os  <- raster("data/AgCensus_cows_2km.tif")
-AgCensus_sheep_os <- projectRaster(AgCensus_sheep_os, crs = "+init=epsg:27700")
-AgCensus_cows_os  <- projectRaster(AgCensus_cows_os, crs = "+init=epsg:27700")
-AgCensus_sheep_ll <- projectRaster(AgCensus_sheep_os, crs = "+init=epsg:4326")
-AgCensus_cows_ll  <- projectRaster(AgCensus_cows_os, crs = "+init=epsg:4326")
-
-saveRDS(AgCensus_sheep_ll, "data/AgCensus_sheep_ll.RDS")
-saveRDS(AgCensus_cows_ll, "data/AgCensus_cows_ll.RDS")
+# AgCensus_sheep_os <- raster("data/AgCensus_sheep_2km.tif")
+# AgCensus_cows_os  <- raster("data/AgCensus_cows_2km.tif")
+# AgCensus_sheep_os <- projectRaster(AgCensus_sheep_os, crs = "+init=epsg:27700")
+# AgCensus_cows_os  <- projectRaster(AgCensus_cows_os, crs = "+init=epsg:27700")
+# AgCensus_sheep_ll <- projectRaster(AgCensus_sheep_os, crs = "+init=epsg:4326")
+# AgCensus_cows_ll  <- projectRaster(AgCensus_cows_os, crs = "+init=epsg:4326")
+# 
+# saveRDS(AgCensus_sheep_ll, "data/AgCensus_sheep_ll.RDS")
+# saveRDS(AgCensus_cows_ll, "data/AgCensus_cows_ll.RDS")
 
 # Revised AgCensus data for new RO area
 agcensus <- readRDS("data/agcensus.RDS")
+crs(agcensus) <- sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+
 library(leaflet)
+
 
 paltcow <- colorBin(c("#FFFFCC", "#c2e699", "#78c679", "#31a354", "#006837"),
                    values(agcensus$tot_cattle), na.color = "transparent")
@@ -30,7 +33,7 @@ palsheep <- colorBin(c("#FFFFCC", "#c2e699", "#78c679", "#31a354", "#006837"),
 leaflet(options = leafletOptions(minZoom = 7.25, zoomDelta=0.1, zoomSnap=0.05)) %>%
   addTiles(group = "OSM (default)") %>%
   addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
-  addRasterImage(agcensus$tot_cattle,  colors=paltcow,   group="Cattle", opacity=0.6) %>% 
+  addRasterImage(agcensus$tot_cattle,  colors=paltcow,   group="Cattle", opacity=0.6) #%>% 
   addRasterImage(agcensus$beef, colors=palbeef, group="Beef", opacity=0.6) %>%
   addRasterImage(agcensus$dairy, colors=paldairy, group="Dairy", opacity=0.6) %>%
   addRasterImage(agcensus$pigs, colors=palpigs, group="Pigs", opacity=0.6) %>%

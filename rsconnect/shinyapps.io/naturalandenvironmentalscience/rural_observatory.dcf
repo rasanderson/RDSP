@@ -1,0 +1,13 @@
+name: rural_observatory
+title: rural_observatory
+username:
+account: naturalandenvironmentalscience
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5332203
+bundleId: 5376582
+url: https://naturalandenvironmentalscience.shinyapps.io/rural_observatory/
+when: 1639587284.80416
+lastSyncTime: 1639587284.80418
+asMultiple: FALSE
+asStatic: FALSE
